@@ -6,6 +6,8 @@ clear screen;
 -------------------------------------------------
 
 --Create table Student
+
+drop table Student; 
 create table Student(studentId int ,name varchar2(20), 
 phone varchar2(20), age int);
 
@@ -24,6 +26,8 @@ insert into Student values (10,'Rafiq','01797494254',63);
 
 
 --Create table Borrows
+
+drop table Borrows; 
 create table Borrows(studentId int ,bookId int,dateBorrowed date);
 
 
@@ -41,6 +45,7 @@ insert into Borrows values (2,10,'25-JUN-2021');
 
 --Create table Book
 
+drop table Book;
 create table Book(bookId int ,authorId int,title varchar2(50),
 genre varchar2(50));
 
@@ -59,6 +64,7 @@ insert into Book values (2,10,'Ami-Topu','Non-Fiction');
 
 --Create table Author
 
+drop table Author; 
 create table Author(authorId int,name varchar2(50),
 age int);
 
