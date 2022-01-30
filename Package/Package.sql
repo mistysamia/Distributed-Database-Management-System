@@ -2,6 +2,7 @@ clear screen;
 SET VERIFY OFF;
 SET SERVEROUTPUT ON;
 
+--Like -> java interface 
 create or replace package mypack AS
     function F1(A1 in number)
 	   return number;
@@ -9,6 +10,8 @@ create or replace package mypack AS
 End mypack;
 /
 
+
+--Package Body 
 create or replace package body mypack AS
     function F1(A1 in number) --No need to write create or REPLACE
 	return NUMBER
@@ -35,6 +38,7 @@ End mypack;
 /
 
 
+-- Print
 select mypack.f1(21) from dual;
 Exec mypack.p1(22);
 
