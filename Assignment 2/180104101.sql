@@ -4,7 +4,8 @@ Question :
 
 You are a student of CSE department and 'Database' is your favourite course . 
 You wish to have all your 'Database' courses to be taken by your favourite teacher of your department .
-Now take input of your favourite teacher's name and his department ID. You have to ensure that as many times you get a student 
+Now take input of your favourite teacher's name and his department ID. Firstly find out if there's any database course in your department or not.
+Then you have to ensure that as many times you get a student 
 of CSE department you will add your favourite faculty name and his department ID in the FACULTY table  .  
 
 */
