@@ -15,7 +15,7 @@ BEGIN
     A := :New.id;
     B := :old.name;
     C := :new.taka;
-	insert into money1 values (A,b,c);
+    insert into money1 values (A,b,c);
 End;
 /
 
