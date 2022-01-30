@@ -9,12 +9,12 @@ for each row
 
 DECLARE
     A money.id%type;
-	B money.name%type;
-	C money.taka%type;
+    B money.name%type;
+    C money.taka%type;
 BEGIN
     A := :New.id;
-	B := :old.name;
-	C := :new.taka;
+    B := :old.name;
+    C := :new.taka;
 	insert into money1 values (A,b,c);
 End;
 /
