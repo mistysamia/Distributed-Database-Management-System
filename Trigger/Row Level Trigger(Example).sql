@@ -1,7 +1,7 @@
 clear screen;
 SET SERVEROUTPUT ON;
 
-create or replace trigger hello4
+create or replace trigger t1
 after update or insert
 of taka
 on money
