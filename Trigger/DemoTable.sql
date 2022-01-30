@@ -13,3 +13,9 @@ insert into money values(3,'C',300);
 commit;
 select * from money;
 
+drop table money1;
+create table money1 (id number , name varchar2(20), taka number);
+commit;
+
+select * from money1;
+
