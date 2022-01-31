@@ -1,6 +1,6 @@
 clear screen
 SET SERVEROUTPUT ON;
-
+--If we want to print something (DBMS_....) then have to write this on the top
 
 DECLARE 
         t_name varchar2(20);
