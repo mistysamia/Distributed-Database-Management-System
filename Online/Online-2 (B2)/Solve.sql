@@ -21,13 +21,13 @@ End;
 
 -------------  Function  --------------
 
-create or replace function customerSearching(A in Orders.cid%TYPE)
+create or replace function customerSearching(A in Customer.cid%TYPE)
 return number
 is
 
 flag number :=0;
 BEGIN
-    for R IN (select * from Orders) LOOP
+    for R IN (select * from Customer) LOOP
             if A=R.cid THEN
 			   flag:=1;
 		       return flag;
