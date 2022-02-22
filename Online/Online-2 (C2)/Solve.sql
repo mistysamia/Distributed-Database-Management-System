@@ -43,7 +43,7 @@ is
 C number:=0;
 BEGIN
     for P IN (select * from Customer) LOOP 
-	    for R IN (select * from Orders where (A=sid and P.cid=cid) and datePlaced>='01-Jan-22' AND datePlaced>='02-Feb-22') LOOP
+	    for R IN (select * from Orders where (A=sid and P.cid=cid) and datePlaced>='01-Jan-22' AND datePlaced<='02-Feb-22') LOOP
             C:=1+C;
 			Exit;
 	    End loop;
