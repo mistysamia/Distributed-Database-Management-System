@@ -47,16 +47,22 @@ create or replace package body mypack AS
     is
     flag number:=0;
 	countTimes number:=0;
+	endLoop number :=0;
     BEGIN
         for R IN (select * from Customer) LOOP
             if A=R.cid THEN
-		        for P IN (select * from Orders) LOOP
-				    if P.cid=A THEN
-					    countTimes:=countTimes+1;
-						DBMS_OUTPUT.PUT_LINE('The date they orders at the restaurant '||P.datePlaced);
-					End if;
-			    end loop;
-				DBMS_OUTPUT.PUT_LINE('The number of time the customer ate that restaurant:  '||countTimes);
+			    select count(oid) into flag from Orders;
+				for I IN 1..flag LOOP
+				    endLoop:=0;
+				    for P IN (select * from Orders) LOOP
+				        if P.cid=A and P.oid=I and endLoop=0 THEN
+					        countTimes:=countTimes+1;
+						    DBMS_OUTPUT.PUT_LINE('The order date : '||P.datePlaced);
+							endLoop:=1;
+					    End if;
+			        end loop;  
+				end loop;
+				DBMS_OUTPUT.PUT_LINE('The number of times the customer ate st that restaurant : '||countTimes);
 				return 1;
 		    End if;
 	    End loop;
@@ -68,15 +74,22 @@ create or replace package body mypack AS
    
     procedure showDetails(A in Customer.cid%TYPE)
     is 
+	flag number:=0;
+	endLoop number :=0;
     BEGIN 
-        for P IN (select * from Orders) LOOP
-				if P.cid=A THEN
+	    select count(oid) into flag from Orders;
+		for I IN 1..flag LOOP
+			endLoop:=0;
+			for P IN (select * from Orders) LOOP
+				if P.cid=A and P.oid=I and endLoop=0 THEN
 					for R IN (select * from Server) LOOP
 					    if R.sid=P.sid then 
-						   DBMS_OUTPUT.PUT_LINE('The server details '||R.sname ||' , '||R.shiftid );
-						end if;
+						   DBMS_OUTPUT.PUT_LINE('The server''s , ID : '||R.sid ||' , Name : '||R.sname ||'  , ShiftID : '||R.shiftid );
+					    end if;
 					end loop;
+					endLoop:=1;
 				End if;
+			 end loop;  
 		end loop;
     End showDetails;
 	
