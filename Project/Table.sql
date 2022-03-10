@@ -454,6 +454,15 @@ create or replace package mypack AS
 	gf in PerformanceList11.gf%TYPE,ga in PerformanceList11.ga%TYPE,points in PerformanceList11.points%TYPE,countryName Teamlist1.country %TYPE,
 	seasonID Teamlist1.seasonID %TYPE);
 	
+	procedure insertTeam1(teamID in Teamlist1.teamID %TYPE,winId in PerformanceList11.win%TYPE,lostId in PerformanceList11.lost%TYPE,draw in PerformanceList11.draw%TYPE,
+	gf in PerformanceList11.gf%TYPE,ga in PerformanceList11.ga%TYPE,points in PerformanceList11.points%TYPE,rbStatus in RelegationBattle111.rbStatus%TYPE);
+	
+	procedure insertTeam2(teamID in Teamlist1.teamID %TYPE,winId in PerformanceList11.win%TYPE,lostId in PerformanceList11.lost%TYPE,draw in PerformanceList11.draw%TYPE,
+	gf in PerformanceList11.gf%TYPE,ga in PerformanceList11.ga%TYPE,points in PerformanceList11.points%TYPE,rbStatus in RelegationBattle111.rbStatus%TYPE);
+	
+	procedure insertTeam3(teamID in Teamlist1.teamID %TYPE,winId in PerformanceList11.win%TYPE,lostId in PerformanceList11.lost%TYPE,draw in PerformanceList11.draw%TYPE,
+	gf in PerformanceList11.gf%TYPE,ga in PerformanceList11.ga%TYPE,points in PerformanceList11.points%TYPE,rbStatus in RelegationBattle111.rbStatus%TYPE);
+	
 End mypack;
 /
 
@@ -800,6 +809,106 @@ create or replace package body mypack AS
 	    mypack.finding(TO_CHAR(seasonID));
     End relegatedCountrySeason; 
 	
+	
+	
+	procedure insertTeam1(teamID in Teamlist1.teamID %TYPE,winId in PerformanceList11.win%TYPE,lostId in PerformanceList11.lost%TYPE,draw in PerformanceList11.draw%TYPE,
+	gf in PerformanceList11.gf%TYPE,ga in PerformanceList11.ga%TYPE,points in PerformanceList11.points%TYPE,rbStatus in RelegationBattle111.rbStatus%TYPE)
+	is 
+	
+	perID PerformanceList11.perID%TYPE;
+	relID RelegationBattle111.relID%TYPE;
+    BEGIN 
+	  
+	    if points<35 then
+		        select count(perID) into perID from PerformanceList11;
+	            insert into PerformanceList11 values(perID,teamID,winId,lostId,draw,gf,ga,points);
+				if rbStatus='Yes' then
+				    select count(relID) into relID from RelegationBattle111;
+				    insert into RelegationBattle111 values(relID,perID,rbStatus);
+				else
+			        select count(relID) into relID from RelegationBattle112;
+				    insert into RelegationBattle112 values(relID,perID,rbStatus);
+				End if;
+		else
+		        select count(perID) into perID from PerformanceList12;
+	            insert into PerformanceList12 values(perID,teamID,winId,lostId,draw,gf,ga,points);
+				if rbStatus='Yes' then
+				    select count(relID) into relID from RelegationBattle121;
+				    insert into RelegationBattle121 values(relID,perID,rbStatus);
+				else
+			        select count(relID) into relID from RelegationBattle122;
+				    insert into RelegationBattle122 values(relID,perID,rbStatus);
+				End if;
+		End  if;
+    End insertTeam1; 
+	
+	
+	procedure insertTeam2(teamID in Teamlist1.teamID %TYPE,winId in PerformanceList11.win%TYPE,lostId in PerformanceList11.lost%TYPE,draw in PerformanceList11.draw%TYPE,
+	gf in PerformanceList11.gf%TYPE,ga in PerformanceList11.ga%TYPE,points in PerformanceList11.points%TYPE,rbStatus in RelegationBattle111.rbStatus%TYPE)
+	is 
+	
+	perID PerformanceList11.perID%TYPE;
+	relID RelegationBattle111.relID%TYPE;
+    BEGIN 
+	  
+	    if points<35 then
+		        select count(perID) into perID from PerformanceList21;
+	            insert into PerformanceList21 values(perID,teamID,winId,lostId,draw,gf,ga,points);
+				if rbStatus='Yes' then
+				    select count(relID) into relID from RelegationBattle211;
+				    insert into RelegationBattle211 values(relID,perID,rbStatus);
+				else
+			        select count(relID) into relID from RelegationBattle212;
+				    insert into RelegationBattle212 values(relID,perID,rbStatus);
+				End if;
+		else
+		        select count(perID) into perID from PerformanceList22;
+	            insert into PerformanceList22 values(perID,teamID,winId,lostId,draw,gf,ga,points);
+				if rbStatus='Yes' then
+				    select count(relID) into relID from RelegationBattle221;
+				    insert into RelegationBattle221 values(relID,perID,rbStatus);
+				else
+			        select count(relID) into relID from RelegationBattle222;
+				    insert into RelegationBattle222 values(relID,perID,rbStatus);
+				End if;
+		End  if;
+    End insertTeam2; 
+	
+	procedure insertTeam3(teamID in Teamlist1.teamID %TYPE,winId in PerformanceList11.win%TYPE,lostId in PerformanceList11.lost%TYPE,draw in PerformanceList11.draw%TYPE,
+	gf in PerformanceList11.gf%TYPE,ga in PerformanceList11.ga%TYPE,points in PerformanceList11.points%TYPE,rbStatus in RelegationBattle111.rbStatus%TYPE)
+	is 
+	
+	perID PerformanceList11.perID%TYPE;
+	relID RelegationBattle111.relID%TYPE;
+    BEGIN 
+	  
+	    if points<35 then
+		        select count(perID) into perID from PerformanceList31;
+	            insert into PerformanceList31 values(perID,teamID,winId,lostId,draw,gf,ga,points);
+				if rbStatus='Yes' then
+				    select count(relID) into relID from RelegationBattle311;
+				    insert into RelegationBattle311 values(relID,perID,rbStatus);
+				else
+			        select count(relID) into relID from RelegationBattle312;
+				    insert into RelegationBattle312 values(relID,perID,rbStatus);
+				End if;
+		else
+		        select count(perID) into perID from PerformanceList32;
+	            insert into PerformanceList32 values(perID,teamID,winId,lostId,draw,gf,ga,points);
+				if rbStatus='Yes' then
+				    select count(relID) into relID from RelegationBattle321;
+				    insert into RelegationBattle321 values(relID,perID,rbStatus);
+				else
+			        select count(relID) into relID from RelegationBattle322;
+				    insert into RelegationBattle322 values(relID,perID,rbStatus);
+				End if;
+		End  if;
+    End insertTeam3;
+	
+	
+	
+	
+	
 End mypack;
 /
 
@@ -808,27 +917,30 @@ End mypack;
 
 
 
-Accept X  char prompt "Search  or Insert |Countrywise (England/Spain/Both) | Seasonwise (1/2/3/All) :"
+Accept X  char prompt "(Search/Insert)|(England/Spain/Both)|(1/2/3/All)|(Yes/No/None):"
 
 DECLARE
     operationType varchar2(100):='&operationType';
 	countrywise varchar2(100):='&countrywise';
 	seasonwise varchar2(100):='&seasonwise';
-	teamName varchar2(20) := '&teamname';
-	countryname varchar2(20) := '&countryname';
-    seasonID int := &seasonID;      
-	winID int := &winID;
-	drawID int := &drawID;
-	lostID int := &lostID;
-	gfID int := &gfID;
-	gaID int := &gaID;
-	pointsID int := &pointsID;
+	rbStatus RelegationBattle111.rbStatus%TYPE:='&relegationStatus';
+	teamName Teamlist1.teamName%TYPE := '&teamname';
+	countryname Teamlist1.country%TYPE := '&countryname';
+	teamID Teamlist1.teamID%TYPE; 
+    seasonID Teamlist1.seasonID%TYPE := &seasonID;      
+	winID PerformanceList11.win%TYPE := &winID;
+	drawID PerformanceList11.draw%TYPE := &drawID;
+	lostID PerformanceList11.lost%TYPE := &lostID;
+	gfID PerformanceList11.gf%TYPE := &gfID;
+	gaID PerformanceList11.ga%TYPE := &gaID;
+	pointsID PerformanceList11.pointsID%TYPE := &pointsID;
+	
 	
 	Error Exception; 
 	ErrorOption Exception;
 	
 BEGIN
-    If (seasonID<=0 or winID<=0 or drawID<=0 or lostID<=0 or gfID<=0 or  gaID<=0 or pointsID<=0 )   then 
+    If ((seasonID<=0 or seasonID>3)or winID<=0 or drawID<=0 or lostID<=0 or gfID<=0 or  gaID<=0 or pointsID<=0 )   then 
 	    raise Error;  
 	end if;
 	If (('SEARCH'!=UPPER(operationType) and 'INSERT'!=UPPER(operationType)) and
@@ -852,7 +964,19 @@ BEGIN
 		    End if;
 		End  if;
 	Elsif UPPER(operationType)='INSERT' then
-	    
+	    if seasonID=1 then
+	        select count(teamID) into teamID from Teamlist1;
+			insert into Teamlist1 values(teamID,teamName,countryname,seasonID);
+			mypack.insertTeam1(teamID,winID,drawID,lostID,gfID,gaID,pointsID);
+		Elsif seasonID=2 then
+		    select count(teamID) into teamID from Teamlist2;
+			insert into Teamlist2 values(teamID,teamName,countryname,seasonID);
+			mypack.insertTeam2(teamID,winID,drawID,lostID,gfID,gaID,pointsID);
+		Else
+		    select count(teamID) into teamID from Teamlist3;
+			insert into Teamlist3 values(teamID,teamName,countryname,seasonID);
+			mypack.insertTeam3(teamID,winID,drawID,lostID,gfID,gaID,pointsID,rbStatus);
+		End if;	
 	ELSE
 	    raise Error;  
 	end if;
