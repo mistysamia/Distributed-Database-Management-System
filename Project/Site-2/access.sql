@@ -1,0 +1,1 @@
+select * from student@site_link;
