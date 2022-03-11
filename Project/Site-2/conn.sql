@@ -2,7 +2,7 @@
 drop database link site1;
 
 create database link site1
- connect to system identified by "12345"
+ connect to system identified by "Pass"
  using '(DESCRIPTION =
        (ADDRESS_LIST =
          (ADDRESS = (PROTOCOL = TCP)
