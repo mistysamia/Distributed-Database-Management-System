@@ -176,13 +176,53 @@ insert into RecordList(recID, teamName,country, seasonID,win,lost,draw,gf,ga,poi
 
 
 
+
+
+/*********************************************
+**************  Trigger  *****************
+*********************************************/
+
+create or replace trigger triggerResult
+after insert
+on tempResult
+for each row
+
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('Inserted On TempResult Table.');
+End;
+/
+
+create or replace trigger triggerRecordListUpdate
+after update
+of recID
+on RecordList
+
+DECLARE
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('Record List has been Updated');
+End;
+/
+
+create or replace trigger triggerRecordListInsert
+after insert
+on RecordList
+
+DECLARE
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('New row has been inserted into Record List.');
+End;
+/
+
+
 /*********************************************
 **************  Package Head   *****************
 *********************************************/
-create or replace package mypack AS
+
+-------------  Function  --------------
 
 
-	-------------  Function  --------------
+
+create or replace package mypackFunction AS
 
     function Relegation1(perID  in RelegationBattle111.perID  %TYPE)
 	return number;
@@ -204,10 +244,15 @@ create or replace package mypack AS
 
     function findingStatus(teamID in Teamlist1.teamID %TYPE,Status in varchar2)
 	return number;
-	
+
+End mypackFunction;
+/
 
 
-    -------------  Procerdure  --------------
+
+-------------  Procerdure  --------------
+
+create or replace package mypackProcedure AS
 
   	procedure finding(Status in varchar2,resultStatus out varchar2);
 
@@ -248,26 +293,27 @@ create or replace package mypack AS
 	lostId in PerformanceList11.lost%TYPE,draw in PerformanceList11.draw%TYPE,
 	gf in PerformanceList11.gf%TYPE,ga in PerformanceList11.ga%TYPE,points in PerformanceList11.points%TYPE,
 	rbStatus in RelegationBattle111.rbStatus%TYPE);
-	
+
 	procedure UpdateRecornd(recIDUpdate  in RecordList.recID%TYPE,teamNameUpdate in RecordList.teamName%TYPE,
 	countryUpdate  in RecordList.country%TYPE,
 	seasonIDUpdate  in RecordList.seasonID%TYPE,winUpdate in RecordList.win%TYPE,lostUpdate in RecordList.lost%TYPE,
 	drawUpdate  in RecordList.draw%TYPE,gfUpdate in RecordList.gf%TYPE,gaUpdate in RecordList.ga%TYPE,
 	pointsUpdate in RecordList.points%TYPE,predictedStatusUpdate in RecordList.predictedStatus%TYPE);
-	
 
-End mypack;
+
+End mypackProcedure;
 /
+
 
 
 /*********************************************
 **************  Package Body   *****************
 *********************************************/
-create or replace package body mypack AS
-
-
 
     -------------  Function  --------------
+
+
+create or replace package body mypackFunction AS
 
     function Relegation1(perID  in RelegationBattle111.perID  %TYPE)
     return number
@@ -373,8 +419,6 @@ create or replace package body mypack AS
 
 
 
-
-
     function findingStatus(teamID in Teamlist1.teamID %TYPE,Status in varchar2)
     return number
     is
@@ -394,9 +438,9 @@ create or replace package body mypack AS
                     select perID,points from PerformanceList12 where PerformanceList12.teamID=R.teamID);
 
 			        if points<35 then
-			            flag := mypack.Relegation1(perID);
+			            flag := mypackFunction.Relegation1(perID);
                     else
-                        flag := mypack.Relegation2(perID);
+                        flag := mypackFunction.Relegation2(perID);
 			        end if;
 				    return flag;
 		        End if;
@@ -405,18 +449,18 @@ create or replace package body mypack AS
 
 		if Status='Both' or Status='2' then
             for R IN (select * from Teamlist2@site2) LOOP
-			    
+
                 if teamID=R.teamID THEN
 				    select perID,points into perID,points from (
 			        select perID,points from PerformanceList21@site2 where PerformanceList21.teamID@site2=R.teamID
 				    union
                     select perID,points from PerformanceList22@site2 where PerformanceList22.teamID@site2=R.teamID);
-                    
-					
+
+
 			        if points<35 then
-			            flag := mypack.Relegation3(perID);
+			            flag := mypackFunction.Relegation3(perID);
                     else
-                        flag := mypack.Relegation4(perID);
+                        flag := mypackFunction.Relegation4(perID);
 			        end if;
 				    return flag;
 		        End if;
@@ -432,9 +476,9 @@ create or replace package body mypack AS
                     select perID,points from PerformanceList32@site2 where PerformanceList32.teamID@site2=R.teamID);
 
 			        if points<35 then
-			            flag := mypack.Relegation5(perID);
+			            flag := mypackFunction.Relegation5(perID);
                     else
-                        flag := mypack.Relegation6(perID);
+                        flag := mypackFunction.Relegation6(perID);
 			        end if;
 				    return flag;
 		        End if;
@@ -443,9 +487,14 @@ create or replace package body mypack AS
 
     End findingStatus;
 
+End mypackFunction;
+/
 
 
-    -------------  Procerdure  --------------
+-------------  Procerdure  --------------
+
+create or replace package body mypackProcedure AS
+
 
     procedure finding(Status in varchar2,resultStatus out varchar2)
     is
@@ -459,18 +508,16 @@ create or replace package body mypack AS
 		kthRoot:=CEIL(SQRT(kthRoot));
 
 		if mod(kthRoot,2)=0  then
-		    if kthRoot>0 then 
+		    if kthRoot>0 then
 		        kthRoot:=kthRoot-1;
 			else
 			    kthRoot:=kthRoot+1;
 			End if;
 	    End if;
-		
-		--DBMS_OUTPUT.PUT_LINE('Kth Root.' || kthRoot);
 
         for R IN (select * from tempResult order by resultValue asc) LOOP
             if countTimes<kthRoot THEN
-			    flag := mypack.findingStatus(R.teamID,Status);
+			    flag := mypackFunction.findingStatus(R.teamID,Status);
 				countTimes:=countTimes+1;
 				if flag=1 then
 				   yesCount:=yesCount+1;
@@ -491,6 +538,7 @@ create or replace package body mypack AS
 		end if;
     End finding;
 
+
     procedure relegatedBothAll(winId in PerformanceList11.win%TYPE,lostId in PerformanceList11.lost%TYPE,
 	draw in PerformanceList11.draw%TYPE,gf in PerformanceList11.gf%TYPE,ga in PerformanceList11.ga%TYPE,
 	points in PerformanceList11.points%TYPE,resStatus out varchar2)
@@ -508,7 +556,7 @@ create or replace package body mypack AS
 
 				insert into tempResult values (R.teamID,SQRT(rootVal));
 		End loop;
-	    mypack.finding('Both',resultStatus);
+	    mypackProcedure.finding('Both',resultStatus);
 	    resStatus:=resultStatus;
     End relegatedBothAll;
 
@@ -524,7 +572,7 @@ create or replace package body mypack AS
     BEGIN
 
 		if seasonID=1 then
-	            for R IN (select * from (select * from PerformanceList11 union select * from PerformanceList12) 
+	            for R IN (select * from (select * from PerformanceList11 union select * from PerformanceList12)
 				NATURAL  join Teamlist1 ) LOOP
 
 		            rootVal:=POWER((R.win-winId),2)+POWER((R.lost-lostId),2)+POWER((R.draw-draw),2)+POWER((R.gf-gf),2)+POWER((R.ga-ga),2)+POWER((R.points-points),2);
@@ -534,7 +582,7 @@ create or replace package body mypack AS
 		End  if;
 
 		if seasonID=2 then
-	            for R IN (select * from (select * from PerformanceList21@site2 union select * from PerformanceList22@site2) 
+	            for R IN (select * from (select * from PerformanceList21@site2 union select * from PerformanceList22@site2)
 				NATURAL  join Teamlist2@site2 ) LOOP
 
 		            rootVal:=POWER((R.win-winId),2)+POWER((R.lost-lostId),2)+POWER((R.draw-draw),2)+POWER((R.gf-gf),2)+POWER((R.ga-ga),2)+POWER((R.points-points),2);
@@ -552,9 +600,11 @@ create or replace package body mypack AS
 
 		        End loop;
 		End  if;
-	    mypack.finding(TO_CHAR(seasonID),resultStatus);
+	    mypackProcedure.finding(TO_CHAR(seasonID),resultStatus);
 		resStatus:=resultStatus;
+
     End relegatedBothSeason;
+
 
 	procedure relegatedCountryAll(winId in PerformanceList11.win%TYPE,lostId in PerformanceList11.lost%TYPE,
 	draw in PerformanceList11.draw%TYPE,
@@ -566,20 +616,20 @@ create or replace package body mypack AS
 	rootVal number :=0;
 	resultStatus varchar2(20);
     BEGIN
-        
+
 	    for R IN
-	   ((select * from (select * from PerformanceList11 union select * from PerformanceList12) NATURAL  join Teamlist1 
+	   ((select * from (select * from PerformanceList11 union select * from PerformanceList12) NATURAL  join Teamlist1
 	     where Teamlist1.country=countryName) union
-        (select * from (select * from PerformanceList21@site2 union select * from PerformanceList22@site2) NATURAL  join Teamlist2@site2 
+        (select * from (select * from PerformanceList21@site2 union select * from PerformanceList22@site2) NATURAL  join Teamlist2@site2
 		where Teamlist2.country=countryName) union
-        (select * from (select * from PerformanceList31@site2 union select * from PerformanceList32@site2) NATURAL  join Teamlist3@site2 
+        (select * from (select * from PerformanceList31@site2 union select * from PerformanceList32@site2) NATURAL  join Teamlist3@site2
 		where Teamlist3.country=countryName) ) LOOP
-              
+
 			rootVal:=POWER((R.win-winId),2)+POWER((R.lost-lostId),2)+POWER((R.draw-draw),2)+POWER((R.gf-gf),2)+POWER((R.ga-ga),2)+POWER((R.points-points),2);
 			insert into tempResult values (R.teamID,SQRT(rootVal));
 
 		End loop;
-	    mypack.finding('Both',resultStatus);
+	    mypackProcedure.finding('Both',resultStatus);
 	    resStatus:=resultStatus;
     End relegatedCountryAll;
 
@@ -597,7 +647,7 @@ create or replace package body mypack AS
     BEGIN
 
 	    if seasonID=1 then
-	            for R IN (select * from (select * from PerformanceList11 union select * from PerformanceList12) 
+	            for R IN (select * from (select * from PerformanceList11 union select * from PerformanceList12)
 				NATURAL  join Teamlist1 where Teamlist1.country=countryName) LOOP
 
 		            rootVal:=POWER((R.win-winId),2)+POWER((R.lost-lostId),2)+POWER((R.draw-draw),2)+POWER((R.gf-gf),2)+POWER((R.ga-ga),2)+POWER((R.points-points),2);
@@ -607,7 +657,7 @@ create or replace package body mypack AS
 		End  if;
 
 		if seasonID=2 then
-	            for R IN (select * from (select * from PerformanceList21@site2 union select * from PerformanceList22@site2) 
+	            for R IN (select * from (select * from PerformanceList21@site2 union select * from PerformanceList22@site2)
 				NATURAL  join Teamlist2@site2 where Teamlist2.country=countryName) LOOP
 
 		            rootVal:=POWER((R.win-winId),2)+POWER((R.lost-lostId),2)+POWER((R.draw-draw),2)+POWER((R.gf-gf),2)+POWER((R.ga-ga),2)+POWER((R.points-points),2);
@@ -625,7 +675,7 @@ create or replace package body mypack AS
 
 		        End loop;
 		End  if;
-	    mypack.finding(TO_CHAR(seasonID),resultStatus);
+	    mypackProcedure.finding(TO_CHAR(seasonID),resultStatus);
 		resStatus:=resultStatus;
     End relegatedCountrySeason;
 
@@ -721,7 +771,7 @@ create or replace package body mypack AS
 	drawUpdate  in RecordList.draw%TYPE,gfUpdate in RecordList.gf%TYPE,gaUpdate in RecordList.ga%TYPE,
 	pointsUpdate in RecordList.points%TYPE,predictedStatusUpdate in RecordList.predictedStatus%TYPE)
     is
-	
+
 	Error Exception;
 	recID RecordList.recID%TYPE;
     BEGIN
@@ -732,14 +782,12 @@ create or replace package body mypack AS
 	EXCEPTION
 	    when No_data_found then
 	        DBMS_OUTPUT.PUT_LINE('Invalid Record List ID to update.');
-			
+
     End UpdateRecornd;
 
 
-End mypack;
+End mypackProcedure;
 /
-
-
 
 
 
@@ -765,7 +813,7 @@ DECLARE
     recID RecordList.recID%TYPE;
     resultStatus varchar2(20);
 
-	
+
 	Error Exception;
 	ErrorOption Exception;
 
@@ -782,22 +830,22 @@ BEGIN
 	If ('ENGLAND'!=UPPER(countryname) and 'SPAIN'!=UPPER(countryname)) then
 	    raise Error;
 	end if;
-	
+
 
 	if UPPER(operationType)='SEARCH' then
 	    select count(recID) into recID from RecordList;
 	    recID:=recID+1;
 	    if UPPER(countrywise)='BOTH' then
 		  if UPPER(seasonwise)='ALL' then
-		        mypack.relegatedBothAll(winID,drawID,lostID,gfID,gaID,pointsID,resultStatus);
+		        mypackProcedure.relegatedBothAll(winID,drawID,lostID,gfID,gaID,pointsID,resultStatus);
 		    elsif UPPER(seasonwise)='1' or UPPER(seasonwise)='2' or UPPER(seasonwise)='3'  then
-		        mypack.relegatedBothSeason(winID,drawID,lostID,gfID,gaID,pointsID,seasonwise,resultStatus);
+		        mypackProcedure.relegatedBothSeason(winID,drawID,lostID,gfID,gaID,pointsID,seasonwise,resultStatus);
 		    End if;
 		elsif UPPER(countrywise)='SPAIN' or UPPER(countrywise)='ENGLAND' then
 		    if UPPER(seasonwise)='ALL' then
-		        mypack.relegatedCountryAll(winID,drawID,lostID,gfID,gaID,pointsID,countrywise,resultStatus);
+		        mypackProcedure.relegatedCountryAll(winID,drawID,lostID,gfID,gaID,pointsID,countrywise,resultStatus);
 		    elsif UPPER(seasonwise)='1' or UPPER(seasonwise)='2' or UPPER(seasonwise)='3'  then
-		        mypack.relegatedCountrySeason(winID,drawID,lostID,gfID,gaID,pointsID,countrywise,seasonwise,resultStatus);
+		        mypackProcedure.relegatedCountrySeason(winID,drawID,lostID,gfID,gaID,pointsID,countrywise,seasonwise,resultStatus);
 		    End if;
 		End  if;
 		insert into RecordList values(recID,teamName,countryname,seasonID,winID,lostID,drawID,gfID,gaID,pointsID,resultStatus) ;
@@ -806,19 +854,19 @@ BEGIN
 		teamID:=teamID+1;
 	    if seasonID=1 then
 			insert into Teamlist1 values(teamID,teamName,countryname,seasonID);
-			mypack.insertTeam1(teamID,winID,lostID,drawID,gfID,gaID,pointsID,rbStatus);
+			mypackProcedure.insertTeam1(teamID,winID,lostID,drawID,gfID,gaID,pointsID,rbStatus);
 		Elsif seasonID=2 then
 			insert into Teamlist2@site2 values(teamID,teamName,countryname,seasonID);
-			mypack.insertTeam2(teamID,winID,lostID,drawID,gfID,gaID,pointsID,rbStatus);
+			mypackProcedure.insertTeam2(teamID,winID,lostID,drawID,gfID,gaID,pointsID,rbStatus);
 		Else
 			insert into Teamlist3@site2 values(teamID,teamName,countryname,seasonID);
-			mypack.insertTeam3(teamID,winID,lostID,drawID,gfID,gaID,pointsID,rbStatus);
+			mypackProcedure.insertTeam3(teamID,winID,lostID,drawID,gfID,gaID,pointsID,rbStatus);
 		End if;
 	Elsif UPPER(operationType)='UPDATE' then
 	    if recIDUpdate<1 then
 		    raise ErrorOption;
 		end if;
-	  --  mypack.UpdateRecornd(recIDUpdate,teamName,countryname,seasonID,winID,lostID,drawID,gfID,gaID,pointsID,rbStatus);
+	    mypackProcedure.UpdateRecornd(recIDUpdate,teamName,countryname,seasonID,winID,lostID,drawID,gfID,gaID,pointsID,rbStatus);
 	ELSE
 	    for R IN (select * from RecordList) LOOP
 			DBMS_OUTPUT.PUT_LINE('History Details :');
