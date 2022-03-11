@@ -264,12 +264,12 @@ insert into RelegationBattle322(relID, perID,rbStatus) values (23,33,'No');
 /*********************************************
 **************  Package Head   *****************
 *********************************************/
-create or replace package mypack AS
 
 
-	-------------  Function  --------------
-
-     function Relegation1(perID  in RelegationBattle211.perID  %TYPE)
+-------------  Function  --------------
+create or replace package mypackFunction AS
+    
+	function Relegation1(perID  in RelegationBattle211.perID  %TYPE)
 	return number;
 
 	function Relegation2(perID  in RelegationBattle211.perID  %TYPE)
@@ -290,9 +290,11 @@ create or replace package mypack AS
     function findingStatus(teamID in Teamlist2.teamID %TYPE,Status in varchar2)
 	return number;
 	
+End mypackFunction;
+/
 
-
-    -------------  Procerdure  --------------
+ -------------  Procerdure  --------------
+create or replace package mypackProcedure AS
 
     procedure finding(Status in varchar2,resultStatus out varchar2);
 
@@ -346,19 +348,17 @@ create or replace package mypack AS
 	pointsUpdate in RecordList.points@site1%TYPE,predictedStatusUpdate in RecordList.predictedStatus@site1%TYPE);
 	
 
-End mypack;
+End mypackProcedure;
 /
 
 
 /*********************************************
 **************  Package Body   *****************
 *********************************************/
-create or replace package body mypack AS
 
-
-
-    -------------  Function  --------------
-
+   -------------  Function  --------------
+   
+create or replace package body mypackFunction AS  
    function Relegation1(perID  in RelegationBattle211.perID  %TYPE)
     return number
     is
@@ -462,9 +462,6 @@ create or replace package body mypack AS
     End Relegation6;
 
 
-
-
-
     function findingStatus(teamID in Teamlist2.teamID %TYPE,Status in varchar2)
     return number
     is
@@ -484,9 +481,9 @@ create or replace package body mypack AS
                     select perID,points from PerformanceList12@site1 where PerformanceList12.teamID=R.teamID);
 
 			        if points<35 then
-			            flag := mypack.Relegation1(perID);
+			            flag := mypackFunction.Relegation1(perID);
                     else
-                        flag := mypack.Relegation2(perID);
+                        flag := mypackFunction.Relegation2(perID);
 			        end if;
 				    return flag;
 		        End if;
@@ -502,9 +499,9 @@ create or replace package body mypack AS
                     select perID,points from PerformanceList22 where PerformanceList22.teamID=R.teamID);
 
 			        if points<35 then
-			            flag := mypack.Relegation3(perID);
+			            flag := mypackFunction.Relegation3(perID);
                     else
-                        flag := mypack.Relegation4(perID);
+                        flag := mypackFunction.Relegation4(perID);
 			        end if;
 				    return flag;
 		        End if;
@@ -520,9 +517,9 @@ create or replace package body mypack AS
                     select perID,points from PerformanceList32 where PerformanceList32.teamID=R.teamID);
 
 			        if points<35 then
-			            flag := mypack.Relegation5(perID);
+			            flag := mypackFunction.Relegation5(perID);
                     else
-                        flag := mypack.Relegation6(perID);
+                        flag := mypackFunction.Relegation6(perID);
 			        end if;
 				    return flag;
 		        End if;
@@ -530,10 +527,13 @@ create or replace package body mypack AS
 		End if;
 
     End findingStatus;
+	
+	
+End mypackFunction;
+/
 
-
-
-    -------------  Procerdure  --------------
+ -------------  Procerdure  --------------
+create or replace package body mypackProcedure AS
 
     procedure finding(Status in varchar2,resultStatus out varchar2)
     is
@@ -554,11 +554,9 @@ create or replace package body mypack AS
 			End if;
 	    End if;
 		
-		--DBMS_OUTPUT.PUT_LINE('Kth Root.' || kthRoot);
-
         for R IN (select * from tempResult@site1 order by resultValue asc) LOOP
             if countTimes<kthRoot THEN
-			    flag := mypack.findingStatus(R.teamID,Status);
+			    flag := mypackFunction.findingStatus(R.teamID,Status);
 				countTimes:=countTimes+1;
 				if flag=1 then
 				   yesCount:=yesCount+1;
@@ -596,7 +594,7 @@ create or replace package body mypack AS
 				rootVal:=POWER((R.win-winId),2)+POWER((R.lost-lostId),2)+POWER((R.draw-draw),2)+POWER((R.gf-gf),2)+POWER((R.ga-ga),2)+POWER((R.points-points),2);
 				insert into tempResult@site1 values (R.teamID,SQRT(rootVal));
 		End loop;
-	    mypack.finding('Both',resultStatus);
+	    mypackProcedure.finding('Both',resultStatus);
 	    resStatus:=resultStatus;
     End relegatedBothAll;
 
@@ -642,7 +640,7 @@ create or replace package body mypack AS
 
 		        End loop;
 		End  if;
-	    mypack.finding(TO_CHAR(seasonID),resultStatus);
+	    mypackProcedure.finding(TO_CHAR(seasonID),resultStatus);
 		resStatus:=resultStatus;
     End relegatedBothSeason;
 
@@ -670,7 +668,7 @@ create or replace package body mypack AS
 			insert into tempResult@site1 values (R.teamID,SQRT(rootVal));
 
 		End loop;
-	    mypack.finding('Both',resultStatus);
+	    mypackProcedure.finding('Both',resultStatus);
 	    resStatus:=resultStatus;
     End relegatedCountryAll;
 
@@ -720,7 +718,7 @@ create or replace package body mypack AS
 
 		        End loop;
 		End  if;
-	    mypack.finding(TO_CHAR(seasonID),resultStatus);
+	    mypackProcedure.finding(TO_CHAR(seasonID),resultStatus);
 		resStatus:=resultStatus;
     End relegatedCountrySeason;
 
@@ -834,7 +832,7 @@ create or replace package body mypack AS
     End UpdateRecornd;
 
 
-End mypack;
+End mypackProcedure;
 /
 
 
@@ -891,15 +889,15 @@ BEGIN
 	    recID:=recID+1;
 	    if UPPER(countrywise)='BOTH' then
 		  if UPPER(seasonwise)='ALL' then
-		        mypack.relegatedBothAll(winID,drawID,lostID,gfID,gaID,pointsID,resultStatus);
+		        mypackProcedure.relegatedBothAll(winID,drawID,lostID,gfID,gaID,pointsID,resultStatus);
 		    elsif UPPER(seasonwise)='1' or UPPER(seasonwise)='2' or UPPER(seasonwise)='3'  then
-		        mypack.relegatedBothSeason(winID,drawID,lostID,gfID,gaID,pointsID,seasonwise,resultStatus);
+		        mypackProcedure.relegatedBothSeason(winID,drawID,lostID,gfID,gaID,pointsID,seasonwise,resultStatus);
 		    End if;
 		elsif UPPER(countrywise)='SPAIN' or UPPER(countrywise)='ENGLAND' then
 		    if UPPER(seasonwise)='ALL' then
-		        mypack.relegatedCountryAll(winID,drawID,lostID,gfID,gaID,pointsID,countrywise,resultStatus);
+		        mypackProcedure.relegatedCountryAll(winID,drawID,lostID,gfID,gaID,pointsID,countrywise,resultStatus);
 		    elsif UPPER(seasonwise)='1' or UPPER(seasonwise)='2' or UPPER(seasonwise)='3'  then
-		        mypack.relegatedCountrySeason(winID,drawID,lostID,gfID,gaID,pointsID,
+		        mypackProcedure.relegatedCountrySeason(winID,drawID,lostID,gfID,gaID,pointsID,
 				countrywise,seasonwise,resultStatus);
 		    End if;
 		End  if;
@@ -911,19 +909,19 @@ BEGIN
 		teamID:=teamID+1;
 	    if seasonID=1 then
 			insert into Teamlist1@site1 values(teamID,teamName,countryname,seasonID);
-			mypack.insertTeam1(teamID,winID,lostID,drawID,gfID,gaID,pointsID,rbStatus);
+			mypackProcedure.insertTeam1(teamID,winID,lostID,drawID,gfID,gaID,pointsID,rbStatus);
 		Elsif seasonID=2 then
 			insert into Teamlist2 values(teamID,teamName,countryname,seasonID);
-			mypack.insertTeam2(teamID,winID,lostID,drawID,gfID,gaID,pointsID,rbStatus);
+			mypackProcedure.insertTeam2(teamID,winID,lostID,drawID,gfID,gaID,pointsID,rbStatus);
 		Else
 			insert into Teamlist3 values(teamID,teamName,countryname,seasonID);
-			mypack.insertTeam3(teamID,winID,lostID,drawID,gfID,gaID,pointsID,rbStatus);
+			mypackProcedure.insertTeam3(teamID,winID,lostID,drawID,gfID,gaID,pointsID,rbStatus);
 		End if;
 	Elsif UPPER(operationType)='UPDATE' then
 	    if recIDUpdate<1 then
 		    raise ErrorOption;
 		end if;
-	    mypack.UpdateRecornd(recIDUpdate,teamName,countryname,seasonID,winID,lostID,drawID,gfID,gaID,pointsID,rbStatus);
+	    mypackProcedure.UpdateRecornd(recIDUpdate,teamName,countryname,seasonID,winID,lostID,drawID,gfID,gaID,pointsID,rbStatus);
 	ELSE
 	    for R IN (select * from RecordList@site1) LOOP
 			DBMS_OUTPUT.PUT_LINE('History Details :');
