@@ -918,17 +918,19 @@ create or replace package body mypack AS
 	drawUpdate  in RecordList.draw%TYPE,gfUpdate in RecordList.gf%TYPE,gaUpdate in RecordList.ga%TYPE,
 	pointsUpdate in RecordList.points%TYPE,predictedStatusUpdate in RecordList.predictedStatus%TYPE)
     is
+	
+	Error Exception;
+	recID RecordList.recID%TYPE;
     BEGIN
-	    --DBMS_OUTPUT.PUT_LINE(' This sdegated. '||recID||'  '||teamName);
-        update RecordList set teamName=teamNameUpdate,country=countryUpdate,seasonID=seasonIDUpdate,
+	    select recID into recID from RecordList where recID=recIDUpdate;
+		update RecordList set teamName=teamNameUpdate,country=countryUpdate,seasonID=seasonIDUpdate,
 		win=winUpdate,lost=lostUpdate,draw=drawUpdate,gf=gfUpdate,
 		ga=gaUpdate,points=pointsUpdate,predictedStatus=predictedStatusUpdate where recID=recIDUpdate;
+	EXCEPTION
+	    when No_data_found then
+	        DBMS_OUTPUT.PUT_LINE('Invalid Record List ID to update.');
+			
     End UpdateRecornd;
-/*
-update RecordList set teamName='nei',country='sd',seasonID=2,win=23,lost=34,draw=34,gf=4,ga=45,points=45,predictedStatus='Yes' where recID=1;
-*/
-
-
 
 
 End mypack;
@@ -939,7 +941,7 @@ End mypack;
 
 
 
-Accept X  char prompt "(Search/Insert)|(England/Spain/Both)|(1/2/3/All)|(Yes/No/None)|(0/ID):"
+Accept X  char prompt "(Search/Insert/Update/History)|(England/Spain/Both/None)|(1/2/3/All/None)|(Yes/No/None)|(0/ID):"
 
 DECLARE
     operationType varchar2(100):='&operationType';
@@ -965,12 +967,13 @@ DECLARE
 	ErrorOption Exception;
 
 BEGIN
-    If ((seasonID<=0 or seasonID>3)or winID<=0 or drawID<=0 or lostID<=0 or gfID<=0 or  gaID<=0 or pointsID<=0 )   then
+    If ((seasonID<=0 or seasonID>3)or winID<=0 or drawID<=0 or lostID<=0 or gfID<=0 or  gaID<=0 or pointsID<=0 or recIDUpdate<0)   then
 	    raise Error;
 	end if;
-	If (('SEARCH'!=UPPER(operationType) and 'INSERT'!=UPPER(operationType) and 'UPDATE'!=UPPER(operationType)) and
-	    ('ENGLAND'!=UPPER(countrywise) and 'SPAIN'!=UPPER(countrywise) and 'BOTH'!=UPPER(countrywise)) and
-		('1'!=UPPER(seasonwise) and '2'!=UPPER(seasonwise) and '3'!=UPPER(seasonwise) and 'ALL'!=UPPER(seasonwise))) then
+	If (('SEARCH'!=UPPER(operationType) and 'INSERT'!=UPPER(operationType) and 'UPDATE'!=UPPER(operationType) and 'HISTORY'!=UPPER(operationType)) and
+	    ('ENGLAND'!=UPPER(countrywise) and 'SPAIN'!=UPPER(countrywise) and 'BOTH'!=UPPER(countrywise) and 'NONE'!=UPPER(countrywise)) and
+		('1'!=UPPER(seasonwise) and '2'!=UPPER(seasonwise) and '3'!=UPPER(seasonwise) and 'ALL'!=UPPER(seasonwise) and 'NONE'!=UPPER(seasonwise)) and
+		('YES'!=UPPER(rbStatus) and 'NO'!=UPPER(rbStatus) and 'NONE'!=UPPER(rbStatus))) then
 	    raise ErrorOption;
 	end if;
 	If ('ENGLAND'!=UPPER(countryname) and 'SPAIN'!=UPPER(countryname)) then
@@ -984,13 +987,13 @@ BEGIN
 	    if UPPER(countrywise)='BOTH' then
 		  if UPPER(seasonwise)='ALL' then
 		        mypack.relegatedBothAll(winID,drawID,lostID,gfID,gaID,pointsID,resultStatus);
-		    else
+		    elsif UPPER(seasonwise)='1' or UPPER(seasonwise)='2' or UPPER(seasonwise)='3'  then
 		        mypack.relegatedBothSeason(winID,drawID,lostID,gfID,gaID,pointsID,seasonwise,resultStatus);
 		    End if;
-		else
+		elsif UPPER(countrywise)='SPAIN' or UPPER(countrywise)='ENGLAND' then
 		    if UPPER(seasonwise)='ALL' then
 		        mypack.relegatedCountryAll(winID,drawID,lostID,gfID,gaID,pointsID,countrywise,resultStatus);
-		    else
+		    elsif UPPER(seasonwise)='1' or UPPER(seasonwise)='2' or UPPER(seasonwise)='3'  then
 		        mypack.relegatedCountrySeason(winID,drawID,lostID,gfID,gaID,pointsID,countrywise,seasonwise,resultStatus);
 		    End if;
 		End  if;
@@ -1000,7 +1003,6 @@ BEGIN
 		teamID:=teamID+1;
 	    if seasonID=1 then
 			insert into Teamlist1 values(teamID,teamName,countryname,seasonID);
-			DBMS_OUTPUT.PUT_LINE('Invalid Inssd. '|| teamID);
 			mypack.insertTeam1(teamID,winID,lostID,drawID,gfID,gaID,pointsID,rbStatus);
 		Elsif seasonID=2 then
 			insert into Teamlist2 values(teamID,teamName,countryname,seasonID);
@@ -1009,8 +1011,17 @@ BEGIN
 			insert into Teamlist3 values(teamID,teamName,countryname,seasonID);
 			mypack.insertTeam3(teamID,winID,lostID,drawID,gfID,gaID,pointsID,rbStatus);
 		End if;
-	ELSE
+	Elsif UPPER(operationType)='UPDATE' then
+	    if recIDUpdate<1 then
+		    raise ErrorOption;
+		end if;
 	    mypack.UpdateRecornd(recIDUpdate,teamName,countryname,seasonID,winID,lostID,drawID,gfID,gaID,pointsID,rbStatus);
+	ELSE
+	    for R IN (select * from RecordList) LOOP
+			DBMS_OUTPUT.PUT_LINE('History Details :');
+			DBMS_OUTPUT.PUT_LINE(R.recID||' '||R.teamName||' '||R.country||' '||R.seasonID||' '||R.win||' '||R.lost||' '||
+			R.draw||' '||R.gf||' '||R.ga||' '||R.points||' '||R.predictedStatus);
+		End loop;
 	end if;
 
 EXCEPTION
