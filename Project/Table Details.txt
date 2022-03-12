@@ -1,0 +1,23 @@
+table Teamlist1 ; --1
+table Teamlist2 ;--2
+table Teamlist3 ;--2
+table PerformanceList11 ;--1
+table PerformanceList12 ;--1
+table PerformanceList21 ;--2
+table PerformanceList22 ;--2
+table PerformanceList31 ;--2
+table PerformanceList32 ;--2
+table RelegationBattle111 ;--1
+table RelegationBattle112 ;--1
+table RelegationBattle121 ;--1
+table RelegationBattle122 ;--1
+table RelegationBattle211 ;--2
+table RelegationBattle212 ;--2
+table RelegationBattle221 ;--2
+table RelegationBattle222 ;--2
+table RelegationBattle311 ;--2
+table RelegationBattle312 ;--2
+table RelegationBattle321 ;--2
+table RelegationBattle322 ;--2
+table tempResult ;--1 -> View (2)
+table RecordList ;--1 -> View (2)
