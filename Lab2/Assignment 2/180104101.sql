@@ -1,0 +1,86 @@
+/*
+
+Question :
+
+You are a student of CSE department and 'Database' is your favourite course . 
+You wish to have all your 'Database' courses to be taken by your favourite teacher of your department .
+Now take input of your favourite teacher's name and his department ID. You have to ensure that as many times you get a student 
+of CSE department you will add your favourite faculty name and his department ID in the FACULTY table  .  
+
+*/
+
+clear screen;
+SET VERIFY OFF;
+SET SERVEROUTPUT ON;
+
+
+DECLARE
+    FacultyName FACULTY.fName%TYPE := '&Favourite_Faculty_Name';
+	DeptId FACULTY.deptid%TYPE := &x;
+	
+	N number ;
+	Num number ;
+	indx number:=1;
+	student_exists number:= 0;
+	facultyIndx FACULTY.Fid%TYPE;
+	
+	courseIdTemp number:= -1;
+	facultyIdTemp number:= -1;
+	courseName COURSE.cname%TYPE;
+	courseId COURSE.cnum%TYPE;
+	facultyId COURSE.Fid%TYPE;
+	
+	studentIdTemp number:= -1;
+	studentId STUDENT.snum%TYPE;
+	majorName STUDENT.major%TYPE;
+	
+	
+	enrolledStudent ENROLLED.snum%TYPE;
+	enrolledCourse ENROLLED.cnum%TYPE;
+	
+BEGIN
+ 
+     select count(cnum) into N from COURSE;
+     FOR i IN 1..N LOOP
+	    select cname,cnum ,Fid into courseName,courseId,facultyId from COURSE where cnum = i;
+		IF courseName='Database' THEN
+		    courseIdTemp := courseId;
+			EXIT;
+		END IF;
+	 END LOOP;
+	 
+	 
+	select count(Fid) into facultyIndx from FACULTY;
+	IF courseIdTemp=-1 THEN
+	    DBMS_OUTPUT.PUT_LINE('Database Course is not in the table');
+	 ELSE
+	    select count(snum) into N from STUDENT;
+        
+		WHILE indx<N
+		LOOP
+		    BEGIN
+		        select snum,major  into studentId,majorName from STUDENT where snum = indx;
+			EXCEPTION 
+                WHEN NO_DATA_FOUND THEN
+                    student_exists := 1;			
+			END;
+			
+			
+			IF student_exists = 1 THEN
+				student_exists := 0;
+			ELSE
+				student_exists := 0;
+			    IF majorName='CSE' THEN
+		           studentIdTemp := studentId;
+				   facultyIndx:= facultyIndx+1;
+				   insert into FACULTY values (facultyIndx , FacultyName,DeptId);
+		        END IF;
+            END IF;
+			indx:=indx+1;
+	    END LOOP;
+	END IF;
+END;
+/
+
+commit;
+select * from FACULTY;

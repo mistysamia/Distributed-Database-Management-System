@@ -1,0 +1,15 @@
+create or replace function test
+return number is
+BEGIN
+   DBMS_OUTPUT.PUT_LINE('hello there  ');
+ --  A:=35;
+   return 5;
+End test;
+/
+Declare 
+    Num number; 
+begin 
+    Num := test; 
+	DBMS_OUTPUT.PUT_LINE(Num);
+end;
+/
